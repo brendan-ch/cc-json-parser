@@ -1,10 +1,8 @@
 #include "parse.hpp"
 #include <iostream>
 
-int parse_object(const string &json)
-{
-    return 0;
-}
+// key constraint: we're not actually building a tree, just validating
+// the json string
 
 string trim(const string &json)
 {
@@ -32,10 +30,40 @@ string trim(const string &json)
     return substr;
 }
 
+int parse_relation(const string &relation)
+{
+    // parses a single relation (e.g. "key": "value")
+    return 0;
+}
+
+int parse_object(const string &json)
+{
+    auto relations = json.substr(1, json.length() - 2);
+
+    string unparsed = relations.substr();
+
+    auto delimiter_index = unparsed.find(',');
+    while (delimiter_index != string::npos)
+    {
+        // parse before delimiter, then update substring to exclude parsed
+        int result = parse_relation(unparsed.substr(0, delimiter_index));
+        if (result != 0)
+        {
+            return result;
+        }
+
+        unparsed = unparsed.substr(delimiter_index + 1);
+        delimiter_index = unparsed.find(',');
+    }
+
+    return 0;
+}
+
 int parse(const string &json)
 {
     auto substr = trim(json);
-    if (substr.length() == 0) return 1;
+    if (substr.length() == 0)
+        return 1;
 
     char start_char = substr.at(0);
     char end_char = substr.at(substr.length() - 1);
