@@ -46,14 +46,38 @@ string trim(const string &json)
 
 int parse_relation(const string &relation)
 {
-    return 0;
+    // exclusive to keys: must be a string
+
+    string trimmed_relation = trim(relation);
+    if (trimmed_relation.length() == 0)
+    {
+        return 1;
+    }
+
+    if (trimmed_relation.at(0) != '"')
+    {
+        return 1;
+    }
+
+    int end_key = trimmed_relation.find('"', 1);
+    if (end_key == string::npos)
+    {
+        return 1;
+    }
+
+    int delimiter = trimmed_relation.find(':', end_key);
+    if (delimiter == string::npos)
+    {
+        return 1;
+    }
+
+    string value = trimmed_relation.substr(delimiter + 1);
+    return parse(value);
 }
 
 int parse_object(const string &json)
 {
-    auto relations = json.substr(1, json.length() - 2);
-
-    string unparsed = relations.substr();
+    string unparsed = json.substr(1, json.length() - 2);
 
     auto delimiter_index = unparsed.find(',');
     while (delimiter_index != string::npos)
@@ -67,6 +91,11 @@ int parse_object(const string &json)
 
         unparsed = unparsed.substr(delimiter_index + 1);
         delimiter_index = unparsed.find(',');
+    }
+    int result = parse_relation(unparsed);
+    if (result != 0)
+    {
+        return result;
     }
 
     return 0;
@@ -85,7 +114,7 @@ int parse(const string &json)
     {
         return parse_object(substr);
     }
-    else if (start_char == '"' && end_char == '}')
+    else if (start_char == '"' && end_char == '"')
     {
         return 0;
     }
