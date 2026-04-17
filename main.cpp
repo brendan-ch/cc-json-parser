@@ -66,6 +66,7 @@ int main(int count, char **args)
         if (count == 3)
         {
             run_tests(string(args[2]));
+            return 0;
         }
         else
         {
