@@ -4,6 +4,14 @@
 // key constraint: we're not actually building a tree, just validating
 // the json string
 
+bool is_number_str(const string &s)
+{
+    // https://stackoverflow.com/questions/29169153/how-do-i-verify-a-string-is-valid-double-even-if-it-has-a-point-in-it
+    char* end = nullptr;
+    double val = strtod(s.c_str(), &end);
+    return end != s.c_str() && *end == '\0' && val != HUGE_VAL;
+}
+
 int find_first_non_whitespace_char_index_inclusive(const string &str)
 {
     int end = str.length();
@@ -115,6 +123,14 @@ int parse(const string &json)
         return parse_object(substr);
     }
     else if (start_char == '"' && end_char == '"')
+    {
+        return 0;
+    }
+    else if (substr == "true" || substr == "false" || substr == "null")
+    {
+        return 0;
+    }
+    else if (is_number_str(substr))
     {
         return 0;
     }
