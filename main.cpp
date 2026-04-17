@@ -74,6 +74,18 @@ int main(int count, char **args)
             return 1;
         }
     }
+
     string contents = read_file(args[1]);
-    return parse(contents);
+    int result = parse(contents);
+
+    if (result == 0)
+    {
+        cout << "Valid JSON" << endl;
+    }
+    else
+    {
+        cout << "Invalid JSON" << endl;
+    }
+
+    return result;
 }
