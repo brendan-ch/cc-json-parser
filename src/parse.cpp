@@ -124,6 +124,7 @@ size_t find_next_comma_outside_of_nested_object_or_array(const string &str)
 int parse_object(const string &json)
 {
     string unparsed = json.substr(1, json.length() - 2);
+    if (unparsed.length() == 0) return 0;
 
     auto delimiter_index = find_next_comma_outside_of_nested_object_or_array(unparsed);
     while (delimiter_index != string::npos)
@@ -147,6 +148,36 @@ int parse_object(const string &json)
     return 0;
 }
 
+int parse_array(const string &json)
+{
+    string unparsed = json.substr(1, json.length() - 2);
+
+    // empty arrays are fine
+    if (unparsed.length() == 0) return 0;
+
+    // instead of parsing relations, parse each item between delimiter directly
+
+    auto delimiter_index = find_next_comma_outside_of_nested_object_or_array(unparsed);
+    while (delimiter_index != string::npos)
+    {
+        int result = parse(unparsed.substr(0, delimiter_index));
+        if (result != 0)
+        {
+            return result;
+        }
+
+        unparsed = unparsed.substr(delimiter_index + 1);
+        delimiter_index = find_next_comma_outside_of_nested_object_or_array(unparsed);
+    }
+    int result = parse(unparsed);
+    if (result != 0)
+    {
+        return result;
+    }
+
+    return 0;
+}
+
 int parse(const string &json)
 {
     auto substr = trim(json);
@@ -159,6 +190,10 @@ int parse(const string &json)
     if (start_char == '{' && end_char == '}')
     {
         return parse_object(substr);
+    }
+    else if (start_char == '[' && end_char == ']')
+    {
+        return parse_array(substr);
     }
     else if (start_char == '"' && end_char == '"')
     {
