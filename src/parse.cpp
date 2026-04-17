@@ -10,7 +10,6 @@ string trim(const string &json)
 {
     int start = 0;
     int end = json.length();
-    cout << start << " " << end << endl;
 
     if (start >= end)
         return "";
