@@ -4,27 +4,41 @@
 // key constraint: we're not actually building a tree, just validating
 // the json string
 
+int find_first_non_whitespace_char_index_inclusive(const string &str)
+{
+    int end = str.length();
+    int index = 0;
+
+    char index_char = str.at(index);
+    while (index < end - 1 && (index_char == ' ' || index_char == '\n'))
+    {
+        index++;
+        index_char = str.at(index);
+    }
+
+    return index;
+}
+
+int find_last_non_whitespace_char_index_exclusive(const string &str)
+{
+    int index = str.length();
+    char end_char = str.at(index - 1);
+    while (0 < index - 1 && (end_char == ' ' || end_char == '\n'))
+    {
+        index--;
+        end_char = str.at(index - 1);
+    }
+
+    return index;
+}
+
 string trim(const string &json)
 {
-    int start = 0;
-    int end = json.length();
-
-    if (start >= end)
+    if (json.length() == 0)
         return "";
 
-    char start_char = json.at(start);
-    while (start < end - 1 && (start_char == ' ' || start_char == '\n'))
-    {
-        start++;
-        start_char = json.at(start);
-    }
-
-    char end_char = json.at(end - 1);
-    while (start < end - 1 && (end_char == ' ' || end_char == '\n'))
-    {
-        end--;
-        end_char = json.at(end - 1);
-    }
+    int start = find_first_non_whitespace_char_index_inclusive(json);
+    int end = find_last_non_whitespace_char_index_exclusive(json);
 
     auto substr = json.substr(start, end - start);
     return substr;
@@ -32,7 +46,6 @@ string trim(const string &json)
 
 int parse_relation(const string &relation)
 {
-    // parses a single relation (e.g. "key": "value")
     return 0;
 }
 
