@@ -7,7 +7,7 @@
 bool is_number_str(const string &s)
 {
     // https://stackoverflow.com/questions/29169153/how-do-i-verify-a-string-is-valid-double-even-if-it-has-a-point-in-it
-    char* end = nullptr;
+    char *end = nullptr;
     double val = strtod(s.c_str(), &end);
     return end != s.c_str() && *end == '\0' && val != HUGE_VAL;
 }
@@ -83,11 +83,49 @@ int parse_relation(const string &relation)
     return parse(value);
 }
 
+size_t find_next_comma_outside_of_nested_object_or_array(const string &str)
+{
+    int curly_bracket_count = 0;
+    int square_bracket_count = 0;
+    auto index = 0;
+    auto end = str.length();
+
+    // upon finding a comma, if both ints are 0, then return that index
+
+    while (index < end)
+    {
+        if (str.at(index) == '{')
+        {
+            curly_bracket_count++;
+        }
+        else if (str.at(index) == '}')
+        {
+            curly_bracket_count--;
+        }
+        else if (str.at(index) == '[')
+        {
+            square_bracket_count++;
+        }
+        else if (str.at(index) == ']')
+        {
+            square_bracket_count--;
+        }
+        else if (str.at(index) == ',' && curly_bracket_count == 0 && square_bracket_count == 0)
+        {
+            return index;
+        }
+
+        index++;
+    }
+
+    return string::npos;
+}
+
 int parse_object(const string &json)
 {
     string unparsed = json.substr(1, json.length() - 2);
 
-    auto delimiter_index = unparsed.find(',');
+    auto delimiter_index = find_next_comma_outside_of_nested_object_or_array(unparsed);
     while (delimiter_index != string::npos)
     {
         // parse before delimiter, then update substring to exclude parsed
@@ -98,7 +136,7 @@ int parse_object(const string &json)
         }
 
         unparsed = unparsed.substr(delimiter_index + 1);
-        delimiter_index = unparsed.find(',');
+        delimiter_index = find_next_comma_outside_of_nested_object_or_array(unparsed);
     }
     int result = parse_relation(unparsed);
     if (result != 0)
